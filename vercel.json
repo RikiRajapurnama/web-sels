@@ -23,6 +23,7 @@
     "APP_ENV": "production",
     "APP_DEBUG": "false",
     "APP_NAME": "XL SATU WiFi",
+    "APP_KEY": "base64:JmJ6xxLaGbDTQiSXgM/3bBrJGNvQigWfpGx/TXncGVI=",
     "APP_URL": "https://ucok-six.vercel.app",
     "APP_SEED": "true",
     "APP_LOCALE": "id",
