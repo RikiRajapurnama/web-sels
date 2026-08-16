@@ -8,7 +8,6 @@ Thumbs.db
 
 # Laravel runtime state
 /storage
-/bootstrap/cache/*.php
 
 # Dependencies (installed during build)
 /vendor

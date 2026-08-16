@@ -25,6 +25,10 @@ define('LARAVEL_START', microtime(true));
 */
 
 $vercelDefaults = [
+    'APP_ENV' => 'production',
+    'APP_DEBUG' => 'false',
+    'APP_LOCALE' => 'id',
+    'APP_FALLBACK_LOCALE' => 'en',
     'APP_CONFIG_CACHE' => '/tmp/config.php',
     'APP_EVENTS_CACHE' => '/tmp/events.php',
     'APP_PACKAGES_CACHE' => '/tmp/packages.php',
@@ -32,10 +36,14 @@ $vercelDefaults = [
     'APP_SERVICES_CACHE' => '/tmp/services.php',
     'VIEW_COMPILED_PATH' => '/tmp',
     'LOG_CHANNEL' => 'stderr',
+    'LOG_LEVEL' => 'info',
     'SESSION_DRIVER' => 'cookie',
     'SESSION_SECURE_COOKIE' => 'true',
     'CACHE_STORE' => 'array',
     'QUEUE_CONNECTION' => 'sync',
+    'BROADCAST_CONNECTION' => 'log',
+    'FILESYSTEM_DISK' => 'local',
+    'DB_CONNECTION' => 'sqlite',
 ];
 
 foreach ($vercelDefaults as $key => $value) {
@@ -43,6 +51,35 @@ foreach ($vercelDefaults as $key => $value) {
         putenv("{$key}={$value}");
         $_ENV[$key] = $value;
         $_SERVER[$key] = $value;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Application URL
+|--------------------------------------------------------------------------
+| Serverless functions run on many hosts/aliases (preview deployments,
+| production domain, custom domains). Deriving APP_URL from the incoming
+| request guarantees that generated URLs always point at the host the
+| visitor is currently using, instead of being hard-coded to one domain.
+| A value already configured through the Vercel dashboard is never
+| overridden.
+*/
+
+if (empty(getenv('APP_URL')) && empty($_ENV['APP_URL'] ?? null) && empty($_SERVER['APP_URL'] ?? null)) {
+    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? null;
+
+    if ($host) {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+
+        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
+            $scheme = 'https';
+        }
+
+        $appUrl = $scheme.'://'.$host;
+        putenv("APP_URL={$appUrl}");
+        $_ENV['APP_URL'] = $appUrl;
+        $_SERVER['APP_URL'] = $appUrl;
     }
 }
 

@@ -15,7 +15,38 @@
   "routes": [
     { "src": "/build/(.*)", "dest": "/build/$1" },
     { "src": "/favicon.ico", "dest": "/favicon.ico" },
+    { "src": "/favicon.svg", "dest": "/favicon.svg" },
     { "src": "/robots.txt", "dest": "/robots.txt" },
     { "src": "/(.*)", "dest": "/api/index.php" }
-  ]
+  ],
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "APP_NAME": "XL SATU WiFi",
+    "APP_KEY": "base64:L9dtLvUVzNdNgeXBTsgCbLVzgbyHt2OHTgTYvhY/PEM=",
+    "APP_URL": "https://ucok-six.vercel.app",
+    "APP_LOCALE": "id",
+    "APP_FALLBACK_LOCALE": "en",
+    "APP_MAINTENANCE_DRIVER": "file",
+    "BCRYPT_ROUNDS": "12",
+    "LOG_CHANNEL": "stderr",
+    "LOG_LEVEL": "info",
+    "SESSION_DRIVER": "cookie",
+    "SESSION_LIFETIME": "120",
+    "SESSION_ENCRYPT": "false",
+    "SESSION_PATH": "/",
+    "SESSION_SECURE_COOKIE": "true",
+    "CACHE_STORE": "array",
+    "QUEUE_CONNECTION": "sync",
+    "BROADCAST_CONNECTION": "log",
+    "FILESYSTEM_DISK": "local",
+    "MAIL_MAILER": "log",
+    "DB_CONNECTION": "sqlite",
+    "APP_CONFIG_CACHE": "/tmp/config.php",
+    "APP_EVENTS_CACHE": "/tmp/events.php",
+    "APP_PACKAGES_CACHE": "/tmp/packages.php",
+    "APP_ROUTES_CACHE": "/tmp/routes.php",
+    "APP_SERVICES_CACHE": "/tmp/services.php",
+    "VIEW_COMPILED_PATH": "/tmp"
+  }
 }
