@@ -2,6 +2,29 @@
 
 use Illuminate\Support\Str;
 
+/*
+|--------------------------------------------------------------------------
+| PDO MySQL SSL options
+|--------------------------------------------------------------------------
+| Many cloud database providers (Aiven, PlanetScale, Railway, etc.) require
+| TLS. Set DB_SSL=true on Vercel to enable SSL; DB_SSL_VERIFY=true keeps full
+| certificate verification, while DB_SSL_VERIFY=false (default) tolerates
+| self-signed/private CA certificates used by managed providers. An optional
+| CA bundle can be supplied with MYSQL_ATTR_SSL_CA.
+*/
+
+$pdoMysqlOptions = [];
+
+if (extension_loaded('pdo_mysql')) {
+    if (defined('PDO::MYSQL_ATTR_SSL_CA') && env('MYSQL_ATTR_SSL_CA')) {
+        $pdoMysqlOptions[constant('PDO::MYSQL_ATTR_SSL_CA')] = env('MYSQL_ATTR_SSL_CA');
+    }
+
+    if (env('DB_SSL') && defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
+        $pdoMysqlOptions[constant('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')] = env('DB_SSL_VERIFY', false) === true;
+    }
+}
+
 return [
 
     /*
@@ -58,9 +81,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') && env('MYSQL_ATTR_SSL_CA') && defined('PDO::MYSQL_ATTR_SSL_CA')
-                ? [constant('PDO::MYSQL_ATTR_SSL_CA') => env('MYSQL_ATTR_SSL_CA')]
-                : [],
+            'options' => $pdoMysqlOptions,
         ],
 
         'mariadb' => [
@@ -78,9 +99,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') && env('MYSQL_ATTR_SSL_CA') && defined('PDO::MYSQL_ATTR_SSL_CA')
-                ? [constant('PDO::MYSQL_ATTR_SSL_CA') => env('MYSQL_ATTR_SSL_CA')]
-                : [],
+            'options' => $pdoMysqlOptions,
         ],
 
         'pgsql' => [

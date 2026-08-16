@@ -30,6 +30,7 @@ class AuthController extends Controller
                 $request->boolean('remember')
             );
         } catch (\Throwable $e) {
+            error_log('[Admin Login] Database error: '.$e->getMessage());
             throw ValidationException::withMessages([
                 'login' => 'Database tidak tersedia saat ini. Coba lagi nanti atau hubungi administrator.',
             ]);

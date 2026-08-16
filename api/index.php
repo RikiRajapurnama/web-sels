@@ -43,7 +43,6 @@ $vercelDefaults = [
     'QUEUE_CONNECTION' => 'sync',
     'BROADCAST_CONNECTION' => 'log',
     'FILESYSTEM_DISK' => 'local',
-    'DB_CONNECTION' => 'sqlite',
 ];
 
 foreach ($vercelDefaults as $key => $value) {
@@ -52,6 +51,27 @@ foreach ($vercelDefaults as $key => $value) {
         $_ENV[$key] = $value;
         $_SERVER[$key] = $value;
     }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Database connection
+|--------------------------------------------------------------------------
+| The website can run before an external database exists: with no database
+| configured we fall back to SQLite in-memory semantics so the customer page
+| and the admin login page keep loading. As soon as a production database is
+| configured (DB_HOST / DB_CONNECTION set in the Vercel dashboard) the app
+| connects to it, so the Admin Sales panel can authenticate and save data.
+|
+| A DB_CONNECTION explicitly set in the dashboard always wins.
+*/
+
+if (empty(getenv('DB_CONNECTION')) && empty($_ENV['DB_CONNECTION'] ?? null) && empty($_SERVER['DB_CONNECTION'] ?? null)) {
+    $dbHost = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? null) ?: ($_SERVER['DB_HOST'] ?? null);
+    $dbConnection = empty($dbHost) ? 'sqlite' : 'mysql';
+    putenv("DB_CONNECTION={$dbConnection}");
+    $_ENV['DB_CONNECTION'] = $dbConnection;
+    $_SERVER['DB_CONNECTION'] = $dbConnection;
 }
 
 /*

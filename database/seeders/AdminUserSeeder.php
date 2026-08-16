@@ -11,8 +11,8 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         $username = env('ADMIN_USERNAME', 'admin');
-        $password = env('ADMIN_PASSWORD', 'admin12345');
-        $email = env('ADMIN_EMAIL', 'admin@xlsatuwifi.test');
+        $password = env('ADMIN_PASSWORD', 'AdminXL2026!');
+        $email = env('ADMIN_EMAIL', 'admin@xlsatuwifi.com');
         $name = env('ADMIN_NAME', 'Riki Raja Purnama');
 
         User::updateOrCreate(
