@@ -17,7 +17,12 @@ class WebsiteSetting extends Model
 
     public static function get(string $key, ?string $default = null): ?string
     {
-        $setting = static::where('key', $key)->first();
-        return $setting?->value ?? $default;
+        try {
+            $setting = static::where('key', $key)->first();
+
+            return $setting?->value ?? $default;
+        } catch (\Throwable $e) {
+            return $default;
+        }
     }
 }

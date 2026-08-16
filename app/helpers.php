@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\SalesProfile;
 use App\Models\WebsiteSetting;
+use App\Support\SiteData;
 
 if (!function_exists('site_setting')) {
     function site_setting(string $key, ?string $default = null): ?string
@@ -11,8 +11,8 @@ if (!function_exists('site_setting')) {
 }
 
 if (!function_exists('sales_profile')) {
-    function sales_profile(): SalesProfile
+    function sales_profile(): \App\Models\SalesProfile
     {
-        return SalesProfile::get();
+        return SiteData::salesProfile();
     }
 }

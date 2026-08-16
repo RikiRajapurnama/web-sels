@@ -24,7 +24,18 @@ class AuthController extends Controller
 
         $field = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        if (!Auth::attempt([$field => $credentials['login'], 'password' => $credentials['password']], $request->boolean('remember'))) {
+        try {
+            $authenticated = Auth::attempt(
+                [$field => $credentials['login'], 'password' => $credentials['password']],
+                $request->boolean('remember')
+            );
+        } catch (\Throwable $e) {
+            throw ValidationException::withMessages([
+                'login' => 'Database tidak tersedia saat ini. Coba lagi nanti atau hubungi administrator.',
+            ]);
+        }
+
+        if (!$authenticated) {
             throw ValidationException::withMessages([
                 'login' => 'Username/Email atau password salah.',
             ]);

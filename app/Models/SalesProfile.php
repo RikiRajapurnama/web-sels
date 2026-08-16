@@ -22,15 +22,22 @@ class SalesProfile extends Model
 
     public static function get(): self
     {
-        return static::firstOrCreate([
-            'id' => 1,
-        ], [
-            'name' => 'Riki Raja Purnama',
-            'title' => 'Sales XL SATU WiFi',
-            'description' => 'Saya siap membantu Anda mendapatkan paket internet XL SATU yang sesuai dengan kebutuhan rumah, keluarga maupun usaha.',
-            'whatsapp' => '0831-7752-2021',
-            'operational_hours' => 'Senin - Minggu, 08.00 - 21.00 WIB',
-        ]);
+        try {
+            return static::firstOrCreate([
+                'id' => 1,
+            ], [
+                'name' => 'Riki Raja Purnama',
+                'title' => 'Sales XL SATU WiFi',
+                'description' => 'Saya siap membantu Anda mendapatkan paket internet XL SATU yang sesuai dengan kebutuhan rumah, keluarga maupun usaha.',
+                'whatsapp' => '0831-7752-2021',
+                'operational_hours' => 'Senin - Minggu, 08.00 - 21.00 WIB',
+            ]);
+        } catch (\Throwable $e) {
+            $profile = new static;
+            $profile->forceFill(\App\Support\SiteData::defaultSalesData());
+
+            return $profile;
+        }
     }
 
     public function waNumber(): string

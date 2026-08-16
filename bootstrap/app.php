@@ -18,5 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Database\QueryException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return response()->view('admin.errors.db-unavailable', [], 500);
+            }
+        });
+
+        $exceptions->render(function (\PDOException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return response()->view('admin.errors.db-unavailable', [], 500);
+            }
+        });
     })->create();
