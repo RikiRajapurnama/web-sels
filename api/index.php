@@ -105,14 +105,24 @@ if (empty(getenv('APP_URL')) && empty($_ENV['APP_URL'] ?? null) && empty($_SERVE
 
 /*
 |--------------------------------------------------------------------------
-| Application encryption key fallback
+| Application encryption key
 |--------------------------------------------------------------------------
 | A missing APP_KEY makes Laravel throw on every request (the EncryptCookies
-| middleware needs an encrypter). If the key was not configured in the Vercel
-| dashboard we generate one for this request so the site never 500s because of
-| it. For sessions to survive across serverless invocations (login, forms),
-| add a stable APP_KEY in the Vercel dashboard: generate one locally with
-| `php artisan key:generate --show` and paste it as the APP_KEY value.
+| middleware needs an encrypter), so we can never boot without one.
+|
+| CRITICAL for serverless (Vercel) + SESSION_DRIVER=cookie: the session
+| cookie is encrypted with APP_KEY, and the cookie is what carries the CSRF
+| token between requests. Generating a random key per request means request #1
+| encrypts the session cookie with key A and request #2 cannot decrypt it with
+| key B -> the session looks empty -> the CSRF token never matches -> the
+| browser gets HTTP 419 Page Expired on the login POST.
+|
+| APP_KEY is therefore provided as a STABLE value in vercel.json. A value
+| configured in the Vercel dashboard always wins because dashboard env vars
+| take precedence over vercel.json. The fallback below (random key) must never
+| be relied on for production: it only keeps a misconfigured deployment from
+| 500-ing on the very first request and it logs a warning on stderr so the
+| misconfiguration is visible in the Vercel function runtime logs.
 */
 
 if (empty(getenv('APP_KEY')) && empty($_ENV['APP_KEY'] ?? null) && empty($_SERVER['APP_KEY'] ?? null)) {
@@ -120,6 +130,7 @@ if (empty(getenv('APP_KEY')) && empty($_ENV['APP_KEY'] ?? null) && empty($_SERVE
     putenv("APP_KEY={$appKey}");
     $_ENV['APP_KEY'] = $appKey;
     $_SERVER['APP_KEY'] = $appKey;
+    fwrite(STDERR, '[Vercel] WARNING: APP_KEY is not set. Using a per-request random key; sessions will NOT persist and POST forms will fail with HTTP 419. Set a stable APP_KEY in the Vercel dashboard or vercel.json.'.PHP_EOL);
 }
 
 /*
