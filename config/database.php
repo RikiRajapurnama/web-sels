@@ -4,6 +4,38 @@ use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
+| Default connection resolution
+|--------------------------------------------------------------------------
+|  1. A DB_CONNECTION explicitly configured (local .env, Vercel dashboard,
+|     vercel.json) always wins.
+|  2. Otherwise, when a production connection string is available
+|     (Vercel Postgres / Neon exports POSTGRES_URL; generic PaaS exports
+|     DATABASE_URL) we use PostgreSQL.
+|  3. Otherwise, when a DB_HOST is present we assume MySQL (local XAMPP).
+|  4. As a last resort we fall back to SQLite so the customer website keeps
+|     loading even before any database is configured.
+*/
+
+$defaultConnection = env('DB_CONNECTION');
+
+if (empty($defaultConnection)) {
+    $pgUrl = env('POSTGRES_URL_NON_POOLING')
+        ?: env('POSTGRES_URL')
+        ?: env('DATABASE_URL');
+
+    $dbHost = env('DB_HOST');
+
+    if ($pgUrl) {
+        $defaultConnection = 'pgsql';
+    } elseif ($dbHost) {
+        $defaultConnection = 'mysql';
+    } else {
+        $defaultConnection = 'sqlite';
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | PDO MySQL SSL options
 |--------------------------------------------------------------------------
 | Many cloud database providers (Aiven, PlanetScale, Railway, etc.) require
@@ -39,7 +71,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => $defaultConnection,
 
     /*
     |--------------------------------------------------------------------------
@@ -104,7 +136,10 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DB_URL'),
+            'url' => env('POSTGRES_URL_NON_POOLING')
+                ?: env('POSTGRES_URL')
+                ?: env('DATABASE_URL')
+                ?: env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'laravel'),

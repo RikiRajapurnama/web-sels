@@ -31,7 +31,6 @@
     "BCRYPT_ROUNDS": "12",
     "LOG_CHANNEL": "stderr",
     "LOG_LEVEL": "info",
-    "APP_KEY": "base64:sk4vinxQM6CBTr7wZ/+Wv0cgbUxy0rQVSC6qmvleKBg=",
     "SESSION_DRIVER": "cookie",
     "SESSION_LIFETIME": "120",
     "SESSION_ENCRYPT": "false",

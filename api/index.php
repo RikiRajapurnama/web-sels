@@ -67,8 +67,9 @@ foreach ($vercelDefaults as $key => $value) {
 */
 
 if (empty(getenv('DB_CONNECTION')) && empty($_ENV['DB_CONNECTION'] ?? null) && empty($_SERVER['DB_CONNECTION'] ?? null)) {
+    $pgUrl = getenv('POSTGRES_URL_NON_POOLING') ?: getenv('POSTGRES_URL') ?: getenv('DATABASE_URL') ?: null;
     $dbHost = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? null) ?: ($_SERVER['DB_HOST'] ?? null);
-    $dbConnection = empty($dbHost) ? 'sqlite' : 'mysql';
+    $dbConnection = $pgUrl ? 'pgsql' : ($dbHost ? 'mysql' : 'sqlite');
     putenv("DB_CONNECTION={$dbConnection}");
     $_ENV['DB_CONNECTION'] = $dbConnection;
     $_SERVER['DB_CONNECTION'] = $dbConnection;
