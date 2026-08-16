@@ -1,0 +1,25 @@
+# Private / local files
+.env
+.env.*
+!.env.example
+.vercel
+*.log
+Thumbs.db
+
+# Laravel runtime state
+/storage
+/bootstrap/cache/*.php
+
+# Dependencies (installed during build)
+/vendor
+/node_modules
+
+# Render-specific files (not used on Vercel)
+Dockerfile
+docker-entrypoint.sh
+/docker
+
+# Tests / docs
+/tests
+phpunit.xml
+README.md
