@@ -65,6 +65,27 @@ if (empty(getenv('APP_KEY')) && empty($_ENV['APP_KEY'] ?? null) && empty($_SERVE
     $_SERVER['APP_KEY'] = $appKey;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Fail loudly instead of failing silently
+|--------------------------------------------------------------------------
+| The runtime php.ini sets memory_limit=3008M but the Vercel function is
+| limited to 1024M. If a request ever goes near the container limit the OS
+| kills the whole process and the user sees an empty 500 with no way to
+| diagnose it. Cap PHP well below the container so it raises a normal
+| "Allowed memory size exhausted" Error that we can render/log.
+|
+| We also keep display_errors on for the router: combined with the outer
+| try/catch below, any error that escapes Laravel is shown (and written to
+| stderr, which Vercel surfaces in the function runtime logs) instead of
+| disappearing into an empty response body.
+*/
+
+ini_set('memory_limit', '768M');
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+ini_set('log_errors', '1');
+
 require __DIR__.'/../vendor/autoload.php';
 
 /** @var \Illuminate\Foundation\Application $app */
@@ -90,4 +111,35 @@ if (getenv('APP_SEED') === 'true') {
     }
 }
 
-$app->handleRequest(Request::capture());
+/*
+|--------------------------------------------------------------------------
+| Request handling with a safety net
+|--------------------------------------------------------------------------
+| Laravel catches and renders almost everything itself, but if the
+| exception handler ever fails too (double fault), the exception escapes
+| uncaught and PHP's built-in server answers with an EMPTY 500 — exactly
+| the symptom this project saw. The try/catch below guarantees that any
+| error escaping Laravel is written to stderr (visible in the Vercel
+| function runtime logs) and, when nothing was sent yet, returned as a
+| plain-text 500 so the cause is always visible.
+*/
+
+try {
+    $app->handleRequest(Request::capture());
+} catch (\Throwable $e) {
+    $message = sprintf(
+        '[Vercel] Unhandled exception %s: %s @ %s:%d',
+        get_class($e),
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine()
+    );
+
+    fwrite(STDERR, $message.PHP_EOL);
+
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo $message.PHP_EOL;
+    }
+}
