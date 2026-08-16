@@ -1,0 +1,50 @@
+# Git / VCS
+.git
+.gitignore
+.github
+
+# Editor
+.idea
+.vscode
+*.swp
+
+# Environment (never copy .env into the image)
+.env
+.env.*
+!.env.example
+.env.backup
+.env.production
+auth.json
+
+# Dependencies (installed inside the image)
+node_modules
+vendor
+
+# Frontend build output (rebuilt in the assets stage)
+public/build
+public/hot
+
+# Local databases / logs
+*.sqlite
+*.log
+storage/*.key
+storage/pail
+
+# Local storage content (structure is recreated at runtime)
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/public/uploads/*
+storage/app/private/*
+
+# Tests & CI
+tests
+phpunit.xml
+.phpunit.cache
+
+# Docker files (kept in git, no need to copy into build context copies)
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.override.yml
