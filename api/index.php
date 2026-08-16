@@ -131,7 +131,7 @@ if (empty(getenv('APP_KEY')) && empty($_ENV['APP_KEY'] ?? null) && empty($_SERVE
     putenv("APP_KEY={$appKey}");
     $_ENV['APP_KEY'] = $appKey;
     $_SERVER['APP_KEY'] = $appKey;
-    fwrite(STDERR, '[Vercel] WARNING: APP_KEY is not set. Using a per-request random key; sessions will NOT persist and POST forms will fail with HTTP 419. Set a stable APP_KEY in the Vercel dashboard or vercel.json.'.PHP_EOL);
+    error_log('[Vercel] WARNING: APP_KEY is not set. Using a per-request random key; sessions will NOT persist and POST forms will fail with HTTP 419. Set a stable APP_KEY in the Vercel dashboard or vercel.json.');
 }
 
 /*
@@ -204,7 +204,7 @@ try {
         $e->getLine()
     );
 
-    fwrite(STDERR, $message.PHP_EOL);
+    error_log($message);
 
     if (!headers_sent()) {
         http_response_code(500);
